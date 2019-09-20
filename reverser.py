@@ -49,8 +49,9 @@ if (len(possible_result) > 0):
 
     import re
 
-    def deobf(par): return par if par not in classMap else classMap[par]
-
+    # Regex:
+    #   ^((?:\s+(?:\d+:\d+:)?[\w$.\[\]]+ )?)([\w$.]+)((?:\([^)]*\))?) -> ([\w$.]+)
+    #   $1$4$3 -> $2
     content = re.sub("^((?:\\s+(?:\\d+:\\d+:)?[\\w$.\\[\\]]+ )?)([\\w$.]+)((?:\\([^)]*\\))?) -> ([\\w$.]+)", "\\1\\4\\3 -> \\2", request.text, flags=re.MULTILINE).splitlines()
 
     deobfuscated = list()
@@ -61,7 +62,7 @@ if (len(possible_result) > 0):
             end = content[i].index(')')
             deobfuscated.append(
                 content[i][:start] + ','.join(
-                    map(lambda par: deobf(par),
+                    map(lambda par: par if par not in classMap else classMap[par],
                         filter(lambda par: len(par) > 0,
                                content[i][start:end].split(',')
                                )
@@ -71,7 +72,7 @@ if (len(possible_result) > 0):
         else:
             deobfuscated.append(content[i] + '\n')
 
-    file = open("output.txt", "w+")
+    file = open("output\\reversed_" + versionID + ".txt", "w+")
     file.writelines(deobfuscated)
 
     print("Finished writing to file!")
