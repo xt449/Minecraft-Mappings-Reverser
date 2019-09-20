@@ -24,7 +24,6 @@ import requests
 print("Fetching versions manifest from Mojang...")
 request = requests.get("https://launchermeta.mojang.com/mc/game/version_manifest.json")
 versionID = input("Version: ")
-# json = request.json()
 possible_result = list(
     map(lambda data: data.get("url"),
         filter(lambda data: data.get("id") == versionID,
@@ -36,12 +35,9 @@ possible_result = list(
 if (len(possible_result) > 0):
     print("Fetching version data from Mojang...")
     request = requests.get(possible_result[0])
-    # json = request.json()
     possible_result = request.json().get("downloads").get("server_mappings").get("url")
-    # if(possible_result):
     print("Fetching mappings from Mojang...")
     request = requests.get(possible_result)
-    print("here it comes...")
 
     classMap = dict()
     for line in list(filter(lambda l: l[0] != ' ', request.text.splitlines())):
@@ -56,8 +52,6 @@ if (len(possible_result) > 0):
     def deobf(par): return par if par not in classMap else classMap[par]
 
     content = re.sub("^((?:\\s+(?:\\d+:\\d+:)?[\\w$.\\[\\]]+ )?)([\\w$.]+)((?:\\([^)]*\\))?) -> ([\\w$.]+)", "\\1\\4\\3 -> \\2", request.text, flags=re.MULTILINE).splitlines()
-    print(content[0])
-    print(content[1])
 
     deobfuscated = list()
 
